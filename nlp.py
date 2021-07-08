@@ -32,6 +32,6 @@ def plot_tags_freq(tags):
     ax.set_ylabel("log of counts")
     
     plt.tick_params(axis="x", which="major", labelsize=8)
-    plt.savefig("pos-tag-frequency.png")
+    plt.savefig("results/pos-tag-frequency.png")
 
 

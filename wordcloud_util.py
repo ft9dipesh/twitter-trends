@@ -1,6 +1,6 @@
 import math
 
-import matplotlb.pyplot as plt
+import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 
@@ -11,7 +11,7 @@ def generate_wordcloud(phrases, frequency, mask):
     d_sorted = dict(sorted(d.items(), key = lambda item: item[1], reverse=True))
 
     wordcloud = WordCloud(
-        font_path="./KlokanTechNotoSans-Regular.ttf", 
+        font_path="./fonts/KlokanTechNotoSans-Regular.ttf", 
         width=800, 
         height=800, 
         collocations=False,
@@ -26,6 +26,6 @@ def generate_wordcloud(phrases, frequency, mask):
     plt.axis("off")
     plt.tight_layout(pad=0)
 
-    plt.savefig("wordcloud.png")
+    plt.savefig("results/wordcloud.png")
 
 
