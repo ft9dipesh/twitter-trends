@@ -4,11 +4,14 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
 
-def generate_wordcloud(phrases, frequency, mask):
+def get_sorted_phrasecounts(phrases, frequency, reverse=True):
     d = dict(zip(phrases, frequency))
-    d = {k: 0 if math.isnan(v) else v for k, v in d.items()}
-    
-    d_sorted = dict(sorted(d.items(), key = lambda item: item[1], reverse=True))
+    d = {k: 1 if math.isnan(v) else v for k, v in d.items()}
+
+    return dict(sorted(d.items(), key = lambda item: item[1], reverse=reverse))
+
+def generate_wordcloud(phrases, frequency, mask):
+    d_sorted = get_sorted_phrasecounts(phrases, frequency)
 
     wordcloud = WordCloud(
         font_path="./fonts/KlokanTechNotoSans-Regular.ttf", 

@@ -1,8 +1,16 @@
 import nltk
 import matplotlib.pyplot as plt
+import pandas as pd
+
+from textblob import TextBlob
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+import utils
+
 
 # Setup nltk libs
 nltk.download("averaged_perceptron_tagger")
+nltk.download("vader_lexicon")
 
 
 def get_tags(tokens):
@@ -35,3 +43,53 @@ def plot_tags_freq(tags):
     plt.savefig("results/pos-tag-frequency.png")
 
 
+def sentiment_analyzer(tweets, num_tweets):
+    positive = 0
+    negative = 0
+    neutral = 0
+    polarity = 0
+    tweet_list = []
+    neutral_list = []
+    negative_list = []
+    positive_list = []
+
+    for tweet in tweets:
+        tweet_list.append(tweet.text)
+        analysis = TextBlob(tweet.text)
+        score = SentimentIntensityAnalyzer().polarity_scores(tweet.text)
+
+        neg = score['neg']
+        neu = score['neu']
+        pos = score['pos']
+        comp = score['compound']
+
+        polarity += analysis.sentiment.polarity
+
+        if neg > pos:
+            negative_list.append(tweet.text)
+            negative += 1
+        elif pos > neg:
+            positive_list.append(tweet.text)
+            positive += 1
+        elif pos == neg:
+            neutral_list.append(tweet.text)
+            neutral += 1
+
+    positive = utils.percentage(positive, num_tweets)
+    negative = utils.percentage(negative, num_tweets)
+    neutral = utils.percentage(neutral, num_tweets)
+    polarity = utils.percentage(polarity, num_tweets)
+
+    positive = format(positive, '.2f')
+    negative = format(negative, '.2f')
+    neutral = format(neutral, '.2f')
+
+    tweet_list = pd.DataFrame(tweet_list)
+    neutral_list = pd.DataFrame(neutral_list)
+    negative_list = pd.DataFrame(negative_list)
+    positive_list = pd.DataFrame(positive_list)
+
+    print("Total Number: ", len(tweet_list))
+    print("No. of Positive Tweets: ", len(positive_list))
+    print("No. of neutral Tweets: ", len(neutral_list))
+    print("No. of Negative Tweets: ", len(negative_list))

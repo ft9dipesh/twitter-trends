@@ -3,3 +3,6 @@ nltk
 patplotlib
 numpy
 pandas
+tweepy
+textblob
+python-dotenv

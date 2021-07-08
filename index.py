@@ -2,7 +2,9 @@ from PIL import Image, ImageChops
 
 import pandas as pd
 import numpy as np
+import tweepy
 
+import auth
 import wordcloud_util
 import nlp
 
@@ -25,12 +27,27 @@ twitter_logo = Image.open("twitter_logo.png")
 twitter_mask = np.array(ImageChops.invert(twitter_logo))
 
 # Generate a wordcloud from name, and tweet_volume
-wordcloud_util.generate_wordcloud(trend_phrases, tweet_frequency, twitter_mask)
+#wordcloud_util.generate_wordcloud(trend_phrases, tweet_frequency, twitter_mask)
 
 
 """ POS TAGGING """
 
 # Get POS tags for the trend names
-tags = nlp.get_tags(trend_phrases)
+#tags = nlp.get_tags(trend_phrases)
 # Plot POS tags in descending log scale
-nlp.plot_tags_freq(tags)
+#nlp.plot_tags_freq(tags)
+
+
+""" USING TWEEPY """
+api = auth.initialize()
+
+sorted_trends = wordcloud_util.get_sorted_phrasecounts(
+    trend_phrases, 
+    tweet_frequency
+)
+
+""" TEST """
+num_tweets = 2
+
+test_tweets = tweepy.Cursor(api.search, q="lebron").items(num_tweets)
+nlp.sentiment_analyzer(test_tweets, num_tweets)
