@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def percentage(part, whole):
-    return 100 * float(part) / float(whole)
+    return round(100 * float(part) / float(whole), 2)
 
 
 def count_values_in_column(data, feature):

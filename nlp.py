@@ -41,44 +41,24 @@ def plot_tags_freq(tags):
     ax.set_ylabel("log of counts")
     
     plt.tick_params(axis="x", which="major", labelsize=8)
-    plt.savefig("results/pos-tag-frequency.png")
+    plt.savefig(f"results/pos-tag-frequency.png")
 
 
-def sentiment_analyzer(tweets, num_tweets):
-    positive = 0
-    negative = 0
-    neutral = 0
-    polarity = 0
+def sentiment_analyzer(tweets, num_tweets, query, rank):
     tweet_list = []
-    neutral_list = []
-    negative_list = []
-    positive_list = []
+    rt_counts = []
+    favorite_counts = []
 
     for tweet in tweets:
         tweet_list.append(tweet.text)
+        rt_counts.append(tweet.retweet_count)
+        favorite_counts.append(tweet.favorite_count)
             
     tweet_list = pd.DataFrame(tweet_list)
-    analyze_tweets(tweet_list)
+    analyze_tweets(tweet_list, rt_counts, favorite_counts, query,  rank)
 
 
-def generate_sentiment_chart(query, idx, positive, negative, neutral):
-    plt.figure()
-    labels = [
-        f"Positive [{positive}%]",
-        f"Negative [{negative}%]",
-        f"Neutral [{neutral}%]",
-    ]
-    sizes = [positive, negative, neutral]
-    colors = ["yellowgreen", "red", "blue"]
-    patches, texts = plt.pie(sizes, colors=colors, startangle=90)
-    plt.style.use("default")
-    plt.legend(labels)
-    plt.title(f"Sentiment Analysis for trend - {query}")
-    plt.axis("equal")
-    plt.savefig(f"results/sentiment_{idx}.png")
-
-
-def analyze_tweets(tweet_list):
+def analyze_tweets(tweet_list, rt_counts, favorite_counts, query, rank):
     tweet_list.drop_duplicates(inplace=True)
 
     tw_list = pd.DataFrame(tweet_list)
@@ -110,22 +90,42 @@ def analyze_tweets(tweet_list):
         tw_list.loc[index, "pos"] = pos
         tw_list.loc[index, "neu"] = neu
         tw_list.loc[index, "compound"] = comp
+        tw_list.loc[index, "retweets"] = rt_counts[index]
+        tw_list.loc[index, "favoriites"] = favorite_counts[index]
 
-    tw_list.to_csv("results/tweets_with_sentiments.csv")
+    tw_list.to_csv(f"results/{rank}__tweets-with-sentiments.csv")
 
     tw_list_negative = tw_list[tw_list["sentiment"] == "negative"]
     tw_list_positive = tw_list[tw_list["sentiment"] == "positive"]
     tw_list_neutral = tw_list[tw_list["sentiment"] == "neutral"]
 
+    total_count = len(tw_list)
+    negative_count = len(tw_list_negative)
+    positive_count = len(tw_list_positive)
+    neutral_count = len(tw_list_neutral)
+
+    positive_per = utils.percentage(positive_count, total_count)
+    negative_per = utils.percentage(negative_count, total_count)
+    neutral_per = utils.percentage(neutral_count, total_count)
+    
     sentiment_counts = utils.count_values_in_column(tw_list, "sentiment")
-    sentiment_counts.to_csv("results/sentiment_counts.csv")
+    sentiment_counts.to_csv(f"results/{rank}__sentiment-counts.csv")
 
     plt.figure()
-    names = sentiment_counts.index
-    size=sentiment_counts["Percentage"]
+    labels = [
+        f"Positive [{str(positive_per)}%]", 
+        f"Neutral [{str(neutral_per)}%]",
+        f"Negative [{str(negative_per)}%]"
+    ]
+    sizes = [positive_count, neutral_count, negative_count]
 
-    circle = plt.Circle((0,0), 0.7, color="white")
-    plt.pie(size, labels=names, colors=["green", "red", "blue"])
-    p = plt.gcf()
-    p.gca().add_artist(circle)
-    plt.savefig("results/sentiment_2.png")
+    plt.pie(
+        sizes, 
+        #labels=labels, 
+        colors=["yellowgreen", "blue", "red"],
+        startangle=90,
+        radius=0.6,
+    )
+    plt.legend(labels)
+    plt.title(f"Sentiment for {query}")
+    plt.savefig(f"results/{rank}__sentiment.png")

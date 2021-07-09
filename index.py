@@ -1,4 +1,6 @@
 from PIL import Image, ImageChops
+from langdetect import detect
+from itertools import islice
 
 import pandas as pd
 import numpy as np
@@ -27,15 +29,15 @@ twitter_logo = Image.open("twitter_logo.png")
 twitter_mask = np.array(ImageChops.invert(twitter_logo))
 
 # Generate a wordcloud from name, and tweet_volume
-#wordcloud_util.generate_wordcloud(trend_phrases, tweet_frequency, twitter_mask)
+wordcloud_util.generate_wordcloud(trend_phrases, tweet_frequency, twitter_mask)
 
 
 """ POS TAGGING """
 
 # Get POS tags for the trend names
-#tags = nlp.get_tags(trend_phrases)
+tags = nlp.get_tags(trend_phrases)
 # Plot POS tags in descending log scale
-#nlp.plot_tags_freq(tags)
+nlp.plot_tags_freq(tags)
 
 
 """ USING TWEEPY """
@@ -46,9 +48,19 @@ sorted_trends = wordcloud_util.get_sorted_phrasecounts(
     tweet_frequency
 )
 
-""" TEST """
-num_tweets = 2
-query = "lebron"
 
-test_tweets = tweepy.Cursor(api.search, q=query).items(num_tweets)
-nlp.sentiment_analyzer(test_tweets, num_tweets)
+""" TEST """
+num_tweets = 10
+num_trends_to_analyze = 1
+
+idx=1
+for query, freq in islice(sorted_trends.items(), 0, num_trends_to_analyze):
+    query_tweets = tweepy.Cursor(
+        api.search, 
+        q=query, 
+        lang="en", 
+        show_user=False
+    ).items(num_tweets)
+
+    nlp.sentiment_analyzer(query_tweets, num_tweets, query, idx)
+    idx+=1
