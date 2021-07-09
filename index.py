@@ -48,6 +48,7 @@ sorted_trends = wordcloud_util.get_sorted_phrasecounts(
 
 """ TEST """
 num_tweets = 2
+query = "lebron"
 
-test_tweets = tweepy.Cursor(api.search, q="lebron").items(num_tweets)
+test_tweets = tweepy.Cursor(api.search, q=query).items(num_tweets)
 nlp.sentiment_analyzer(test_tweets, num_tweets)
