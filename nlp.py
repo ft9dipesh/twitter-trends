@@ -51,11 +51,11 @@ def sentiment_analyzer(tweets, num_tweets, query, rank):
 
     for tweet in tweets:
         tweet_list.append(tweet.text)
-        rt_counts.append(tweet.retweet_count)
-        favorite_counts.append(tweet.favorite_count)
+        rt_counts.append(int(tweet.retweet_count))
+        favorite_counts.append(int(tweet.favorite_count))
             
     tweet_list = pd.DataFrame(tweet_list)
-    analyze_tweets(tweet_list, rt_counts, favorite_counts, query,  rank)
+    return analyze_tweets(tweet_list, rt_counts, favorite_counts, query, rank)
 
 
 def analyze_tweets(tweet_list, rt_counts, favorite_counts, query, rank):
@@ -107,8 +107,13 @@ def analyze_tweets(tweet_list, rt_counts, favorite_counts, query, rank):
     positive_per = utils.percentage(positive_count, total_count)
     negative_per = utils.percentage(negative_count, total_count)
     neutral_per = utils.percentage(neutral_count, total_count)
+
+    total_rts = sum(rt_counts)
+    total_favs = sum(favorite_counts)
     
     sentiment_counts = utils.count_values_in_column(tw_list, "sentiment")
+    sentiment_counts["total_retweets"] = total_rts
+    sentiment_counts["total_favorites"] = total_favs
     sentiment_counts.to_csv(f"results/{rank}__sentiment-counts.csv")
 
     plt.figure()
@@ -129,3 +134,5 @@ def analyze_tweets(tweet_list, rt_counts, favorite_counts, query, rank):
     plt.legend(labels)
     plt.title(f"Sentiment for {query}")
     plt.savefig(f"results/{rank}__sentiment.png")
+
+    return [positive_per, negative_per, neutral_per, total_rts, total_favs]

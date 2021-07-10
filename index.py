@@ -54,6 +54,10 @@ num_tweets = 10
 num_trends_to_analyze = 1
 
 idx=1
+
+group_results = []
+res = pd.DataFrame(group_results)
+
 for query, freq in islice(sorted_trends.items(), 0, num_trends_to_analyze):
     query_tweets = tweepy.Cursor(
         api.search, 
@@ -62,5 +66,22 @@ for query, freq in islice(sorted_trends.items(), 0, num_trends_to_analyze):
         show_user=False
     ).items(num_tweets)
 
-    nlp.sentiment_analyzer(query_tweets, num_tweets, query, idx)
+    [
+        positive_per, 
+        negative_per, 
+        neutral_per, 
+        total_rts, 
+        total_favs,
+    ] = nlp.sentiment_analyzer(query_tweets, num_tweets, query, idx)
+    
+    res.loc[idx, "Trend"] = query
+    res.loc[idx, "Positive %"] = positive_per
+    res.loc[idx, "Negative %"] = negative_per
+    res.loc[idx, "Neutral %"] = neutral_per
+    res.loc[idx, "Total Retweets"] = total_rts
+    res.loc[idx, "Total Favorites"] = total_favs
+
     idx+=1
+
+
+res.to_csv("results/trend_results.csv")

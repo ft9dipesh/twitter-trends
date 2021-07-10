@@ -1,4 +1,4 @@
-,Total,Percentage
-negative,5,50.0
-positive,4,40.0
-neutral,1,10.0
+,Total,Percentage,total_retweets,total_favorites
+positive,4,50.0,24861,0
+neutral,3,37.5,24861,0
+negative,1,12.5,24861,0
